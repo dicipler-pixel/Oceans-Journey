@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#8fb8cf">
-<meta name="description" content="Ocean, Coke and Tiny in the yard. Five missions, a photo album and a rideable motorcycle.">
+<meta name="description" content="Ocean, Coke and Tiny in the yard. Missions, a photo album, a swing, a trampoline and a rideable motorcycle.">
 <title>Ocean's Adventure</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chewy&family=Caveat:wght@600;700&family=Nunito:wght@400;600;700;800&display=swap">
 <style>
@@ -76,18 +76,18 @@ html,body{margin:0;height:100%;overflow:hidden;background:#8fb8cf;
 #missionList li.done .tick::after{content:"✓";position:absolute;inset:-7px -2px 0 0;
   color:var(--pink-deep);font-family:Caveat,cursive;font-size:25px;font-weight:700;line-height:1}
 #missionList li.done{color:var(--ink-soft)}
+#missionList li{transition:max-height .45s ease,opacity .35s ease,margin-top .45s ease;
+  max-height:72px;overflow:hidden}
+#missionList li.gone{max-height:0;opacity:0;margin-top:-8px}
 #mission .note{margin:11px 0 0;font-family:Caveat,cursive;font-size:17px;color:var(--ink-soft)}
 
-/* ---- narrator ---- */
-#narrator{position:absolute;left:50%;bottom:212px;transform:translateX(-50%);
-  width:min(92vw,468px);padding:15px 17px;pointer-events:auto;
-  display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start}
-#narrator p{margin:0;font-size:15.5px;line-height:1.5;max-width:60ch;font-weight:600}
-#narrator .who{display:block;font-family:Caveat,cursive;font-size:19px;font-weight:700;
-  color:var(--pink-deep);margin-bottom:2px}
-#speakBtn{border:0;border-radius:999px;width:40px;height:40px;font-size:19px;cursor:pointer;
-  background:#e3d0ad;color:var(--ink)}
-#speakBtn:hover{background:#d6c099}
+/* ---- the story is spoken, never boxed over the yard ---- */
+#voiceBtn{position:absolute;left:18px;bottom:224px;width:46px;height:46px;border-radius:50%;
+  border:0;cursor:pointer;pointer-events:auto;font-size:20px;
+  background:linear-gradient(#a06c42,#5a3820);color:var(--cream);
+  box-shadow:0 4px 12px rgba(38,24,12,.45)}
+#voiceBtn:active{transform:translateY(2px)}
+#voiceBtn.muted{filter:grayscale(.85) brightness(.78)}
 
 /* ---- start screen ---- */
 #titleBackdrop{position:absolute;inset:0;background:url(title_art.webp) center/cover no-repeat;
@@ -177,8 +177,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#8fb8cf;
   #missionList .tick{flex-basis:13px;height:13px;margin-top:2px}
   #mission .note{display:none}
   /* narrator floats above the controls, clear of the parchment */
-  #narrator{top:auto;bottom:206px;padding:12px 13px;width:calc(100vw - 24px)}
-  #narrator p{font-size:14px;line-height:1.45}
+  #voiceBtn{left:14px;bottom:192px;width:42px;height:42px;font-size:18px}
   #joy{width:112px;height:112px;left:14px;bottom:18px}
   #stick{left:35px;top:35px;width:42px;height:42px}
   #paw{width:84px;height:84px;font-size:35px;right:16px;bottom:24px}
@@ -212,11 +211,6 @@ html,body{margin:0;height:100%;overflow:hidden;background:#8fb8cf;
     <p class="note" id="missionNote">Coke is right beside you. Tiny is hiding somewhere.</p>
   </div>
 
-  <div id="narrator" class="parchment hidden">
-    <div><span class="who">Narrator</span><p id="narratorText"></p></div>
-    <button id="speakBtn" aria-label="Read this out loud">🔊</button>
-  </div>
-
   <div id="titleBackdrop"></div>
 
   <div id="startCard">
@@ -233,6 +227,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#8fb8cf;
   </div>
 
   <button id="albumBtn" class="woodBtn plank hidden"><span class="ic">📷</span>Photo Album</button>
+  <button id="voiceBtn" class="hidden" aria-label="Say that again, or mute the story">🔊</button>
 
   <div id="albumScrim" class="hidden"></div>
   <div id="album" class="parchment hidden">
@@ -250,7 +245,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#8fb8cf;
   <div id="joy" class="hidden"><div id="stick"></div></div>
   <button id="camBtn" class="hidden" aria-label="Take a picture">📷</button>
   <button id="paw" class="hidden" aria-label="Interact">🐾</button>
-  <div id="hint" class="hidden"><span class="desk">WASD or arrows · drag to turn · </span>🐾 at a glowing circle, or at the motorcycle</div>
+  <div id="hint" class="hidden"><span class="desk">WASD or arrows · drag to turn · </span>🐾 at a circle, the swing, the trampoline or the motorcycle</div>
   <div id="flash"></div>
 </div>
 
@@ -615,10 +610,11 @@ fenceRun(16,-11.5,16,10);
 /* ---------------- trees, bushes, flowers ---------------- */
 [[-9,3,2.5],[-11.5,8,3],[9.5,6,2.6],[12.5,2,2.4],[-13,-2,2.3],[13.5,9,3.1],[-6,9.5,2.6]]
 .forEach(([x,y,r])=>{
-  cyl(x,y,1.7,.34,3.4,MAT.bark);
-  blob(x,y,4,r,MAT.leaves);
-  blob(x+r*.45,y,4.2,r*.75,MAT.leaves);
-  blob(x-r*.4,y+r*.25,3.7,r*.62,MAT.leaves);
+  cyl(x,y,2.9,.33,5.8,MAT.bark);          /* canopy lifted clear of head height */
+  blob(x,y,6.5,r,MAT.leaves);
+  blob(x+r*.45,y,6.75,r*.75,MAT.leaves);
+  blob(x-r*.4,y+r*.25,6.2,r*.62,MAT.leaves);
+  blob(x+r*.2,y-r*.35,7.0,r*.55,MAT.leaves);
 });
 [-4.6,-3.2,3.2,4.6].forEach(x=>{cyl(x,-2.1,1,.12,1.8,MAT.bark);blob(x,-2.1,1.8,.68,MAT.leaves);});
 
@@ -1105,6 +1101,60 @@ const RIDE={on:false,speed:0,heading:Math.PI,dist:0,audio:null};
 const ball=new THREE.Mesh(new THREE.SphereGeometry(.12,14,11),MAT.ball);
 ball.position.set(6.2,.12,-6.4);ball.castShadow=true;scene.add(ball);
 
+/* ============ things you can play on forever ============ */
+const PLAY={mode:null,t:0};
+
+/* --- swing set, front left --- */
+const SWING={x:-12.4,z:-8.6,top:2.4,len:1.72};   /* open ground, clear of the sign */
+const swingSeat=new THREE.Group();
+{
+  const bar=new THREE.MeshStandardMaterial({color:0x8fa3ad,metalness:.6,roughness:.4});
+  const rope=new THREE.MeshStandardMaterial({color:0xb09a72,roughness:.9});
+  for(const dz of [-1.15,1.15])for(const dx of [-1.25,1.25]){
+    const leg=new THREE.Mesh(new THREE.CylinderGeometry(.06,.07,2.72,10),bar);
+    leg.position.set(SWING.x+dx,1.2,SWING.z+dz);
+    leg.rotation.set(dz>0?-.36:.36,0,dx>0?-.38:.38);
+    leg.castShadow=true;leg.receiveShadow=true;scene.add(leg);
+  }
+  const top=new THREE.Mesh(new THREE.CylinderGeometry(.075,.075,2.7,12),bar);
+  top.position.set(SWING.x,SWING.top,SWING.z);top.rotation.z=Math.PI/2;
+  top.castShadow=true;scene.add(top);
+  for(const dx of [-.28,.28]){
+    const r=new THREE.Mesh(new THREE.CylinderGeometry(.022,.022,SWING.len,6),rope);
+    r.position.set(dx,-SWING.len/2,0);swingSeat.add(r);
+  }
+  const seat=new THREE.Mesh(new THREE.BoxGeometry(.74,.07,.32),MAT.wood);
+  seat.position.set(0,-SWING.len,0);seat.castShadow=true;swingSeat.add(seat);
+  swingSeat.position.set(SWING.x,SWING.top,SWING.z);
+  scene.add(swingSeat);
+}
+
+/* --- trampoline, far right --- */
+const TRAMP={x:11.6,z:-5.6,r:1.55,rim:.62};
+const trampMat=new THREE.Mesh(new THREE.CircleGeometry(TRAMP.r-.16,28),
+  new THREE.MeshStandardMaterial({color:0x2b3a52,roughness:.85}));
+{
+  const frame=new THREE.MeshStandardMaterial({color:0x6f7d86,metalness:.65,roughness:.35});
+  const pad=new THREE.MeshStandardMaterial({color:0x2f6ea3,roughness:.8});
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(TRAMP.r,.14,10,30),pad);
+  ring.rotation.x=Math.PI/2;ring.position.set(TRAMP.x,TRAMP.rim,TRAMP.z);
+  ring.castShadow=true;ring.receiveShadow=true;scene.add(ring);
+  for(let i=0;i<6;i++){
+    const a=i*Math.PI/3;
+    const leg=new THREE.Mesh(new THREE.CylinderGeometry(.055,.055,TRAMP.rim,8),frame);
+    leg.position.set(TRAMP.x+Math.cos(a)*TRAMP.r*.86,TRAMP.rim/2,
+                     TRAMP.z+Math.sin(a)*TRAMP.r*.86);
+    leg.castShadow=true;scene.add(leg);
+  }
+  trampMat.rotation.x=-Math.PI/2;
+  trampMat.position.set(TRAMP.x,TRAMP.rim-.04,TRAMP.z);
+  trampMat.receiveShadow=true;scene.add(trampMat);
+}
+function nearSwing(){return ocean.position.distanceTo(
+  new THREE.Vector3(SWING.x,0,SWING.z))<2.1;}
+function nearTramp(){return ocean.position.distanceTo(
+  new THREE.Vector3(TRAMP.x,0,TRAMP.z))<2.3;}
+
 /* ---------------- missions ---------------- */
 function marker(pos,color){
   const g=new THREE.Group();
@@ -1128,13 +1178,19 @@ const missions={explore:false,tiny:false,coke:false,photo:false,ride:false,memor
 function tickMission(id){
   if(missions[id])return;
   missions[id]=true;
-  document.querySelector(`#missionList li[data-id="${id}"]`).classList.add('done');
+  const row=document.querySelector(`#missionList li[data-id="${id}"]`);
+  if(row){
+    row.classList.add('done');
+    if(id!=='memories')          /* finished jobs drop off, so the board keeps shrinking */
+      setTimeout(()=>{row.classList.add('gone');setTimeout(()=>row.remove(),520);},1500);
+  }
   const left=['explore','tiny','coke','photo','ride'].filter(k=>!missions[k]).length;
   const note=document.getElementById('missionNote');
   if(left>0)note.textContent=left===1?'One more thing to do.':`${left} things left to do.`;
   if(left===0&&!missions.memories){
     missions.memories=true;
-    document.querySelector('#missionList li[data-id="memories"]').classList.add('done');
+    const last=document.querySelector('#missionList li[data-id="memories"]');
+    if(last)last.classList.add('done');
     note.textContent='Adventure is better together. ♥';
     setTimeout(()=>say("Everything on the list was done. Ocean sat down in the grass, Coke flopped over beside her, and Tiny curled up in the sun. Nothing else needed doing today. That was the best part."),4200);
   }
@@ -1165,8 +1221,8 @@ function joyEnd(e){if(e.pointerId===joyPointer){joyPointer=null;joyX=joyY=0;stic
 joy.addEventListener('pointerup',joyEnd);joy.addEventListener('pointercancel',joyEnd);
 
 /* ---------------- narration ---------------- */
-const narr=document.getElementById('narrator'),narrText=document.getElementById('narratorText');
 const pawBtn=document.getElementById('paw');
+let lastLine='',muted=false;
 let started=false;
 const opening=[
   "One bright afternoon Ocean came out into the yard with Coke right beside her. The sun was low and warm and the whole place smelled like cut grass and flowers.",
@@ -1175,13 +1231,19 @@ const opening=[
   "Walk into a glowing circle and press the paw. Press the camera whenever something looks worth keeping."
 ];
 function speak(){
-  if(!('speechSynthesis' in window))return;
+  if(muted||!lastLine||!('speechSynthesis' in window))return;
   speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(narrText.textContent);
+  const u=new SpeechSynthesisUtterance(lastLine);
   u.rate=.9;u.pitch=1.06;speechSynthesis.speak(u);
 }
-document.getElementById('speakBtn').onclick=speak;
-function say(text,voice=true){narrText.textContent=text;narr.classList.remove('hidden');if(voice)speak();}
+function say(text,voice=true){lastLine=text;if(voice)speak();}
+const voiceBtn=document.getElementById('voiceBtn');
+voiceBtn.onclick=()=>{
+  if(muted){muted=false;voiceBtn.classList.remove('muted');speak();}
+  else if(window.speechSynthesis&&speechSynthesis.speaking){
+    muted=true;speechSynthesis.cancel();voiceBtn.classList.add('muted');}
+  else speak();
+};
 
 const startBtn=document.getElementById('startBtn');
 startBtn.onclick=()=>{
@@ -1192,6 +1254,7 @@ startBtn.onclick=()=>{
   pawBtn.classList.remove('hidden');
   document.getElementById('camBtn').classList.remove('hidden');
   document.getElementById('albumBtn').classList.remove('hidden');
+  voiceBtn.classList.remove('hidden');
   document.getElementById('hint').classList.remove('hidden');
   let i=0;say(opening[0]);
   const timer=setInterval(()=>{i++;if(i>=opening.length){clearInterval(timer);return}say(opening[i]);},8500);
@@ -1235,7 +1298,7 @@ function engineLevel(speed,throttle){
   a.gain.gain.setTargetAtTime(RIDE.on?.035+Math.min(Math.abs(speed),9)*.008:0,t,.14);
 }
 
-function nearBike(){return ocean.position.distanceTo(bike.position)<2.6;}
+function nearBike(){return !PLAY.mode&&ocean.position.distanceTo(bike.position)<2.6;}
 function mountBike(){
   RIDE.on=true;RIDE.speed=0;RIDE.heading=bike.rotation.y;RIDE.dist=0;
   if(!RIDE.audio)RIDE.audio=engineAudio();
@@ -1262,9 +1325,30 @@ function dismountBike(){
     '<span class="desk">WASD or arrows · drag to turn · </span>🐾 at a glowing circle';
 }
 
+function leavePlay(){
+  PLAY.mode=null;PLAY.t=0;
+  ocean.rotation.set(0,ocean.rotation.y,0);ocean.scale.set(1,1,1);
+  ocean.userData.limbs.legs.forEach(l=>l.rotation.set(0,0,0));
+  ocean.userData.limbs.arms.forEach(a=>a.rotation.set(0,0,0));
+  swingSeat.rotation.x=0;trampMat.position.y=TRAMP.rim-.04;
+  pawBtn.textContent='🐾';pawBtn.setAttribute('aria-label','Interact');
+}
 pawBtn.onclick=()=>{
+  if(PLAY.mode){leavePlay();return;}
   if(RIDE.on){dismountBike();return;}
   if(nearBike()){mountBike();return;}
+  if(nearSwing()){
+    PLAY.mode='swing';PLAY.t=0;pawBtn.textContent='🛑';
+    pawBtn.setAttribute('aria-label','Hop off the swing');
+    say("Ocean climbed onto the swing and kicked off. Back and forward, back and forward, with Coke watching the whole thing like it was the best trick he had ever seen.");
+    return;
+  }
+  if(nearTramp()){
+    PLAY.mode='tramp';PLAY.t=0;pawBtn.textContent='🛑';
+    pawBtn.setAttribute('aria-label','Hop off the trampoline');
+    say("Ocean climbed onto the trampoline and started bouncing. Higher and higher, and no reason at all to stop.");
+    return;
+  }
   const s=nearestSpot();
   if(!s){say("Have a look around the yard. When you reach a glowing circle, press the paw.");return;}
   s.done=true;s.marker.visible=false;
@@ -1374,8 +1458,53 @@ function rideUpdate(dt,t){
   return true;
 }
 
+function playUpdate(dt,t){
+  PLAY.t+=dt;
+  const L=ocean.userData.limbs;
+  if(PLAY.mode==='swing'){
+    const a=.92*Math.sin(PLAY.t*2.35);          /* a pendulum that never stops */
+    swingSeat.rotation.x=a;
+    /* the seat group rotates about X, so its world offset is (0,-L cos a,-L sin a) */
+    ocean.position.set(SWING.x,
+      SWING.top-Math.cos(a)*SWING.len+.30,
+      SWING.z-Math.sin(a)*SWING.len);
+    ocean.rotation.set(-a*.85,0,0);
+    L.legs.forEach(l=>l.rotation.set(-1.15-a*.5,0,0));
+    L.arms.forEach(ar=>ar.rotation.set(-2.1,0,0));
+  } else {
+    const h=Math.abs(Math.sin(PLAY.t*2.5));     /* a bounce that never stops */
+    const y=h*1.45;
+    ocean.position.set(TRAMP.x,TRAMP.rim-.02+y,TRAMP.z);
+    ocean.rotation.set(0,ocean.rotation.y,0);
+    const squash=y<.18?1-(0.18-y)*1.1:1;
+    ocean.scale.set(1/Math.sqrt(squash),squash,1/Math.sqrt(squash));
+    trampMat.position.y=TRAMP.rim-.04-(1-squash)*1.6;
+    const tuck=Math.max(0,1-y*1.1);
+    L.legs.forEach(l=>l.rotation.set(-tuck*.9,0,0));
+    L.arms.forEach(ar=>ar.rotation.set(-y*1.9,0,0));
+  }
+  /* the dogs wait nearby and stay excited */
+  const spot=new THREE.Vector3(ocean.position.x+1.25,0,ocean.position.z-.7);
+  coke.position.lerp(spot,1-Math.pow(.004,dt));
+  animDog(coke,false,t,true);
+  if(tiny.userData.found){
+    const s2=new THREE.Vector3(ocean.position.x-1.1,0,ocean.position.z-.5);
+    tiny.position.lerp(s2,1-Math.pow(.006,dt));
+    animDog(tiny,false,t,true);
+  }
+  labelOcean.position.set(ocean.position.x,ocean.position.y+.95,ocean.position.z);
+  labelCoke.position.set(coke.position.x,1.15,coke.position.z);
+  labelTiny.position.set(tiny.position.x,tiny.userData.found?.95:.95,tiny.position.z);
+  const tgt=new THREE.Vector3(ocean.position.x,1.35,ocean.position.z);
+  const off=new THREE.Vector3(0,2.4,-6.0).applyAxisAngle(new THREE.Vector3(0,1,0),yaw);
+  follow.copy(tgt).add(off);
+  camera.position.lerp(follow,1-Math.pow(.004,dt));
+  camera.lookAt(tgt);
+}
+
 function update(dt,t){
   if(!started)return;
+  if(PLAY.mode){playUpdate(dt,t);return;}
   if(RIDE.on){rideUpdate(dt,t);
     labelOcean.position.set(ocean.position.x,2.2,ocean.position.z);
     labelCoke.position.set(coke.position.x,1.15,coke.position.z);
@@ -1430,7 +1559,7 @@ function update(dt,t){
   labelCoke.position.set(coke.position.x,1.15,coke.position.z);
   labelTiny.position.set(tiny.position.x,.95,tiny.position.z);
 
-  pawBtn.classList.toggle('ready',!!nearestSpot()||nearBike());
+  pawBtn.classList.toggle('ready',!!nearestSpot()||nearBike()||nearSwing()||nearTramp());
 
   const target=ocean.position.clone();target.y=1.0;
   const offset=new THREE.Vector3(0,3.1,-6.2).applyAxisAngle(new THREE.Vector3(0,1,0),yaw);
